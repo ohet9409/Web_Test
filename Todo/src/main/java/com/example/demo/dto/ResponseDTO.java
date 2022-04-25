@@ -11,7 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-// 제네릭 사용
 public class ResponseDTO<T> {
     private String error;
     private List<T> data;

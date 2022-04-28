@@ -18,10 +18,10 @@ public class TestController {
         List<String> list = new ArrayList<>();
         list.add("Hello World! I'm ResponseEntity. And you got 400!");
         ResponseDTO<String> responseDTO = ResponseDTO.<String>builder().data(list).build();
-        // http statusë¥¼ 400ìœ¼ë¡œ ì„¤ì •
+        // http status¸¦ 400À¸·Î ¼³Á¤
         //return ResponseEntity.badRequest().body(responseDTO);
 
-        // http statusë¥¼ 200ìœ¼ë¡œ ì„¤ì •
+        // http status¸¦ 200À¸·Î ¼³Á¤
         return ResponseEntity.ok().body(responseDTO);
     }
     @GetMapping("/testResponseBody")

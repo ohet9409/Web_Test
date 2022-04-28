@@ -24,7 +24,7 @@ public class TodoService {
 
         log.info("Entity Id : {} is saved", entity.getId());
 
-        return repository.findByUserId(entity.getId());
+        return repository.findByUserId(entity.getUserId());
     }
 
     // 리펙토링한 메서드

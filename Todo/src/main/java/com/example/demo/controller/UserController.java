@@ -8,6 +8,8 @@ import com.example.demo.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,8 @@ public class UserController {
     @Autowired
     private TokenProvider tokenProvider;
 
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
         try {
@@ -31,7 +35,8 @@ public class UserController {
             UserEntity user = UserEntity.builder()
                     .email(userDTO.getEmail())
                     .username(userDTO.getUsername())
-                    .password(userDTO.getPassword())
+//                    .password(userDTO.getPassword())
+                    .password(passwordEncoder.encode(userDTO.getPassword()))
                     .build();
 
             // 서비스를 이용해 리포지터리에 사용자 지정
@@ -42,12 +47,12 @@ public class UserController {
                     .id(registeredUser.getId())
                     .username(registeredUser.getUsername())
                     .build();
-
+            // 유저 정보는 항상 하나이므로 그냥 리스트로 만들어야하는 ResponseDTO를 사용하지 않고 그냥 UserDTO 리턴
             return ResponseEntity.ok().body(responseUserDTO);
 //            return ResponseEntity.ok().body(us);
 
         } catch (Exception e) {
-            // 사용자 정보는 항상 하나이므로 리스트로 만들어야 하는 ResponseDTO를 사용하지 않고 그냥 UserDTO 리턴
+            // 예외가 나는 경우 bad 리스폰스 리턴
             ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
             return ResponseEntity
                     .badRequest()
@@ -59,7 +64,10 @@ public class UserController {
     public ResponseEntity authenticate(@RequestBody UserDTO userDTO) {
         UserEntity user = userService.getByCredentials(
                 userDTO.getEmail(),
-                userDTO.getPassword());
+                userDTO.getPassword(),
+                passwordEncoder);
+
+        log.info("passwordEncode: {}", passwordEncoder);
         if (user != null) {
             // 토큰 생성
             final String token = tokenProvider.create(user);
